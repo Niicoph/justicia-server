@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Usuario;
 
 class Estudio extends Model
 {
+    use HasFactory;
     protected $table = 'estudios';
     protected $fillable = ['nombre', 'limite_docs', 'plan', 'api_token'];
     protected $hidden = ['api_token'];
