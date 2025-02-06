@@ -2,16 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\Estudio;
+use App\Models\Rol;
 use Illuminate\Database\Seeder;
 
-class EstudioSeeder extends Seeder
+class RolSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Estudio::factory(10)->create();
+        Rol::factory(3)->create();
     }
 }

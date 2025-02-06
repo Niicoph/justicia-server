@@ -2,16 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\Estudio;
+use App\Models\Usuario;
 use Illuminate\Database\Seeder;
 
-class EstudioSeeder extends Seeder
+class UsuarioSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Estudio::factory(10)->create();
+        Usuario::factory(10)->create();
     }
 }
