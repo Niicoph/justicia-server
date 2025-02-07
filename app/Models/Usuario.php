@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Estudio;
 use App\Models\Rol;
@@ -12,9 +9,16 @@ use App\Models\Nota;
 use App\Models\Evento;
 use App\Models\PermisoDoc;
 
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+
+
 class Usuario extends Authenticatable implements JWTSubject
 {
     use HasFactory;
+    use Notifiable;
 
     protected $table = 'usuarios';
     protected $fillable = ['nombre', 'email', 'password', 'avatar', 'estudio_id', 'rol_id'];

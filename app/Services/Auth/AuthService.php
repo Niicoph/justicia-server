@@ -3,17 +3,13 @@
 namespace App\Services\Auth;
 
 use App\Repositories\UsuarioRepository;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
-use App\Models\Usuario;
+use Illuminate\Auth\AuthenticationException;
 use Exception;
-
-
 
 class AuthService
 {
-    protected $usuarioRepository;
+    protected UsuarioRepository $usuarioRepository;
 
     public function __construct(UsuarioRepository $usuarioRepository)
     {
@@ -21,46 +17,66 @@ class AuthService
     }
 
     /**
-     * Registra a un nuevo usuario
-     * @param array $validated_data
+     * Register a new user
+     * @param array $usuarioData
      * @return \App\Models\Usuario
      */
-    public function register($validated_data)
+    public function register(array $usuarioData)
     {
-        $validated_data['password'] = Hash::make($validated_data['password']);
-        return $this->usuarioRepository->createUsuario($validated_data);
+        return $this->usuarioRepository->createUsuario($usuarioData);
     }
+
     /**
-     * Inicia sesión de un usuario
+     * Log the user in
      * @param array $credentials
-     * @return array $token, $user
+     * @return array
+     * @throws AuthenticationException
      */
-    public function login($credentials)
+    public function login(array $credentials): array
     {
-        $user = Usuario::where('email', $credentials['email'])->first();
-        if (!$user || !Hash::check($credentials['password'], $user->password)) {
-            throw new Exception('Credenciales incorrectas');
+        if (!$token = Auth::attempt($credentials)) {
+            throw new AuthenticationException('Credenciales incorrectas');
         }
-        $token = JWTAuth::fromUser($user);
-        $encodedToken = base64_encode($token);
-        return ['token' => $encodedToken, 'user' => $user];
+
+        return [
+            'token' => base64_encode($token),
+            'user' => Auth::user()->nombre
+        ];
     }
+
     /**
-     * Desloguea a un usuario
-     * @return void
+     * Log the user out
+     * @param string $cookie
+     * @throws Exception
      */
-    public function logout()
+    public function logout(string $cookie): void
     {
-        Auth::logout();
+        $decodedToken = base64_decode($cookie, true);
+
+        if (!$decodedToken) {
+            throw new Exception('Token inválido');
+        }
+
+        Auth::setToken($decodedToken);
+        Auth::invalidate();
     }
+
     /**
-     * Refresca el token de un usuario
-     * @return array $token, $user
+     * Refresh the token
+     * @return string
      */
-    public function refresh()
+    public function refresh(): string
     {
-        Auth::refresh();
-        $user = Auth::user();
-        return ['token' => Auth::getToken(), 'user' => $user];
+        $tokenRefreshed = Auth::refresh();
+        return base64_encode($tokenRefreshed);
+    }
+
+    /**
+     * Get the authenticated user
+     * @return \App\Models\Usuario
+     */
+    public function loggedUser()
+    {
+        return Auth::user();
     }
 }
