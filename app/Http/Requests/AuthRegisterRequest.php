@@ -28,8 +28,8 @@ class AuthRegisterRequest extends FormRequest
             'password' => 'required|string|min:8|max:40|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
             // data optional based on the Usuario model
             'avatar' =>  'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
-            'estudio_id' => 'required|integer',
-            'rol_id' => 'required|integer'
+            // el rol sera requerido al cliente, no al usuario
+            'rol_id' => 'required|integer',
         ];
     }
     public function messages()

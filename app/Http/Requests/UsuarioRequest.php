@@ -24,11 +24,8 @@ class UsuarioRequest extends FormRequest
         $rules =  [
             'nombre' => 'required|string',
             'email' => 'required|email|max:255|unique:usuarios',
-            'password' => 'required|string|min:8|max:30|confirmed',
+            'password' => 'required|string|min:8|max:30|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
-            // la idea es que estos valores no se pidan. Se envie automaticamente tomando el
-            // valor del usuario logged (admin)
-            'estudio_id' => 'required|integer',
             'rol_id' => 'required|integer',
         ];
         if ($this->isMethod('put')) {

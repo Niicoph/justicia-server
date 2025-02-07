@@ -35,11 +35,13 @@ class UsuarioService
     /**
      * Crea un nuevo usuario
      * @param array $validated_data
+     * @param int $estudio_id
      * @return \App\Models\Usuario
      */
-    public function createUsuario($validated_data)
+    public function createUsuario($validated_data, $estudio_id)
     {
         $validated_data['password'] = Hash::make($validated_data['password']);
+        $validated_data['estudio_id'] = $estudio_id;
         return $this->usuarioRepository->createUsuario($validated_data);
     }
     /**

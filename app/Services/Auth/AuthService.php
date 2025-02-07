@@ -2,6 +2,7 @@
 
 namespace App\Services\Auth;
 
+use App\Services\UsuarioService;
 use App\Repositories\UsuarioRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\AuthenticationException;
@@ -9,21 +10,26 @@ use Exception;
 
 class AuthService
 {
-    protected UsuarioRepository $usuarioRepository;
-
+    protected $usuarioRepository;
     public function __construct(UsuarioRepository $usuarioRepository)
     {
         $this->usuarioRepository = $usuarioRepository;
     }
 
     /**
-     * Register a new user
+     * Register a new user. Solamente un superadmin podra registrar usuarios, por lo que
+     * este metodo no se utilizara en la aplicacion excepto casos puntuales.
+     * utilizaremos usuario_id = NULL para referirnos al superadmin
      * @param array $usuarioData
      * @return \App\Models\Usuario
      */
     public function register(array $usuarioData)
     {
-        return $this->usuarioRepository->createUsuario($usuarioData);
+        // debemos instanciar el servicio de usuarios
+        $usuarioService = new UsuarioService($this->usuarioRepository);
+        // utilizamos un estudio_id default.
+        $usuario_id = NULL;
+        return $usuarioService->createUsuario($usuarioData, $usuario_id);
     }
 
     /**
@@ -43,6 +49,7 @@ class AuthService
             'user' => Auth::user()->nombre
         ];
     }
+
 
     /**
      * Log the user out

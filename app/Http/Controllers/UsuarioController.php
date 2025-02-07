@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UsuarioRequest as RequestUsuario;
 use App\Services\UsuarioService;
+use Illuminate\Support\Facades\Auth;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -48,16 +49,22 @@ class UsuarioController extends Controller
         }
     }
     /**
-     * Crea un nuevo usuario
+     * Crea un nuevo usuario. Para esta instancia deberiamos estar Auth mediante middleware
      * @param RequestUsuario $usuarioRequest
      * @return \Illuminate\Http\Response
      */
     public function store(RequestUsuario $usuarioRequest)
     {
         try {
-            $validated_data = $usuarioRequest->validated();
-            $usuario = $this->usuarioService->createUsuario($validated_data);
-            return response()->json($usuario, 201);
+            $authenticatedUser = Auth::user();
+            if ($authenticatedUser) {
+                // recuperamos el id del estudio
+                $estudio_id =  $authenticatedUser->estudio_id;
+                // validamos datos enviados
+                $validated_data = $usuarioRequest->validated();
+                $usuario = $this->usuarioService->createUsuario($validated_data, $estudio_id);
+                return response()->json($usuario, 201);
+            }
         } catch (Exception $e) {
             return response()->json(['message' => 'Error al crear el usuario', 'error' => $e->getMessage()], 500);
         }
