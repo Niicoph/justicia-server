@@ -2,10 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Estudio;
+use App\Models\Rol;
 use App\Models\Usuario;
 
-class EstudioPolicy
+
+class RolPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -18,13 +19,9 @@ class EstudioPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(Usuario $usuario, Estudio $estudio): bool
+    public function view(Usuario $usuario, Rol $rol): bool
     {
-        // si el usuario es superadmin o pertenece al estudio
-        if ($usuario->estudio_id === $estudio->id || $usuario->rol->nombre === 'superadmin') {
-            return true;
-        }
-        return false;
+        return $usuario->rol->nombre === 'superadmin';
     }
 
     /**
@@ -38,7 +35,7 @@ class EstudioPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(Usuario $usuario): bool
+    public function update(Usuario $usuario, Rol $rol): bool
     {
         return $usuario->rol->nombre === 'superadmin';
     }
@@ -46,7 +43,7 @@ class EstudioPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(Usuario $usuario): bool
+    public function delete(Usuario $usuario, Rol $rol): bool
     {
         return $usuario->rol->nombre === 'superadmin';
     }
@@ -54,7 +51,7 @@ class EstudioPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(Usuario $usuario, Estudio $estudio): bool
+    public function restore(Usuario $usuario, Rol $rol): bool
     {
         return false;
     }
@@ -62,7 +59,7 @@ class EstudioPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(Usuario $usuario, Estudio $estudio): bool
+    public function forceDelete(Usuario $usuario, Rol $rol): bool
     {
         return false;
     }

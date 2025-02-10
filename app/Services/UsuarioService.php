@@ -2,14 +2,18 @@
 
 namespace App\Services;
 
-use App\Http\Requests\UsuarioRequest as UsuarioRequest;
 use App\Repositories\UsuarioRepository;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Usuario;
+use App\Models\Estudio;
+
 
 class UsuarioService
 {
+    use AuthorizesRequests;
     protected $usuarioRepository;
-
     public function __construct(UsuarioRepository $usuarioRepository)
     {
         $this->usuarioRepository = $usuarioRepository;
@@ -21,6 +25,7 @@ class UsuarioService
      */
     public function getUsuarios()
     {
+        $this->authorize('viewAny', Usuario::class);
         return $this->usuarioRepository->getUsuarios();
     }
     /**
@@ -30,37 +35,44 @@ class UsuarioService
      */
     public function getUsuarioById($id)
     {
-        return $this->usuarioRepository->getUsuarioById($id);
+        $usuario = $this->usuarioRepository->getUsuarioById($id);
+        $this->authorize('view', $usuario);
+        return $usuario;
     }
     /**
      * Crea un nuevo usuario
      * @param array $validated_data
-     * @param int $estudio_id
      * @return \App\Models\Usuario
      */
-    public function createUsuario($validated_data, $estudio_id)
+    public function createUsuario($validated_data)
     {
+        $this->authorize('create', Usuario::class);
+        // Si no se especifica un estudio, se asigna el estudio del usuario autenticado
+        $validated_data['estudio_id'] = Auth::user()->estudio_id;
         $validated_data['password'] = Hash::make($validated_data['password']);
-        $validated_data['estudio_id'] = $estudio_id;
         return $this->usuarioRepository->createUsuario($validated_data);
     }
     /**
      * Actualiza un usuario
-     * @param UsuarioRequest $usuarioRequest
+     * @param array $usuarioData
      * @param int $id
      * @return \App\Models\Usuario
      */
-    public function updateUsuario(UsuarioRequest $usuarioRequest, $id)
+    public function updateUsuario($usuarioData, $id)
     {
-        $validated_data = $usuarioRequest->validated();
-        return $this->usuarioRepository->updateUsuario($validated_data, $id);
+        $usuario = $this->getUsuarioById($id);
+        $this->authorize('update', $usuario);
+        return $this->usuarioRepository->updateUsuario($usuarioData, $usuario);
     }
     /**
      * Elimina un usuario
      * @param int $id
+     * @return void
      */
     public function destroyUsuario($id)
     {
-        return $this->usuarioRepository->destroyUsuario($id);
+        $usuario = $this->getUsuarioById($id);
+        $this->authorize('delete', $usuario);
+        $this->usuarioRepository->destroyUsuario($usuario);
     }
 }

@@ -17,19 +17,15 @@ class AuthService
     }
 
     /**
-     * Register a new user. Solamente un superadmin podra registrar usuarios, por lo que
-     * este metodo no se utilizara en la aplicacion excepto casos puntuales.
-     * utilizaremos usuario_id = NULL para referirnos al superadmin
+     * Register a new user. Solamente un superadmin podra registrar usuarios (la idea es no utilizar este metodo)
      * @param array $usuarioData
      * @return \App\Models\Usuario
      */
     public function register(array $usuarioData)
     {
-        // debemos instanciar el servicio de usuarios
-        $usuarioService = new UsuarioService($this->usuarioRepository);
-        // utilizamos un estudio_id default.
-        $usuario_id = NULL;
-        return $usuarioService->createUsuario($usuarioData, $usuario_id);
+        $usuarioData['password'] = bcrypt($usuarioData['password']);
+        $usuarioData['estudio_id'] = NULL;
+        return $this->usuarioRepository->createUsuario($usuarioData);
     }
 
     /**

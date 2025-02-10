@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UsuarioRequest as RequestUsuario;
 use App\Services\UsuarioService;
-use Illuminate\Support\Facades\Auth;
-use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Throwable;
+use Illuminate\Auth\Access\AuthorizationException;
+
 
 class UsuarioController extends Controller
 {
@@ -25,9 +23,14 @@ class UsuarioController extends Controller
     {
         try {
             $usuarios = $this->usuarioService->getUsuarios();
+            if ($usuarios->isEmpty()) {
+                return response()->json(['message' => 'No hay usuarios para mostrar'], 404);
+            }
             return response()->json($usuarios, 200);
-        } catch (Exception $e) {
-            return response()->json(['message' => 'Error al obtener los usuarios', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para ver los usuarios'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al mostrar los usuarios', 'error' => $e->getMessage()], 500);
         }
     }
     /**
@@ -42,30 +45,26 @@ class UsuarioController extends Controller
             return response()->json($usuario, 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Usuario no encontrado'], 404);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Error en la consulta', 'error' => $e->getMessage()], 500);
-        } catch (Throwable $e) {
-            return response()->json(['message' => 'Error inesperado', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para ver este usuario'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al obtener el usuario', 'error' => $e->getMessage()], 500);
         }
     }
     /**
-     * Crea un nuevo usuario. Para esta instancia deberiamos estar Auth mediante middleware
+     * Crea un nuevo usuario.
      * @param RequestUsuario $usuarioRequest
      * @return \Illuminate\Http\Response
      */
     public function store(RequestUsuario $usuarioRequest)
     {
+        $validated_data = $usuarioRequest->validated();
         try {
-            $authenticatedUser = Auth::user();
-            if ($authenticatedUser) {
-                // recuperamos el id del estudio
-                $estudio_id =  $authenticatedUser->estudio_id;
-                // validamos datos enviados
-                $validated_data = $usuarioRequest->validated();
-                $usuario = $this->usuarioService->createUsuario($validated_data, $estudio_id);
-                return response()->json($usuario, 201);
-            }
-        } catch (Exception $e) {
+            $usuario = $this->usuarioService->createUsuario($validated_data);
+            return response()->json($usuario, 201);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para crear un usuario'], 403);
+        } catch (\Exception $e) {
             return response()->json(['message' => 'Error al crear el usuario', 'error' => $e->getMessage()], 500);
         }
     }
@@ -77,15 +76,16 @@ class UsuarioController extends Controller
      */
     public function update(RequestUsuario $usuarioRequest, $id)
     {
+        $validated_data = $usuarioRequest->validated();
         try {
-            $usuario = $this->usuarioService->updateUsuario($usuarioRequest, $id);
+            $usuario = $this->usuarioService->updateUsuario($validated_data, $id);
             return response()->json($usuario, 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Usuario no encontrado'], 404);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Error en la consulta', 'error' => $e->getMessage()], 500);
-        } catch (Throwable $e) {
-            return response()->json(['message' => 'Error inesperado', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para actualizar este usuario'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al actualizar el usuario', 'error' => $e->getMessage()], 500);
         }
     }
     /**
@@ -97,13 +97,13 @@ class UsuarioController extends Controller
     {
         try {
             $this->usuarioService->destroyUsuario($id);
-            return response()->json(['message' => 'Usuario eliminado'], 200);
+            return response()->json(['message' => 'Usuario eliminado correctamente'], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Usuario no encontrado'], 404);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Error en la consulta', 'error' => $e->getMessage()], 500);
-        } catch (Throwable $e) {
-            return response()->json(['message' => 'Error inesperado', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para eliminar este usuario'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al eliminar el usuario', 'error' => $e->getMessage()], 500);
         }
     }
 }

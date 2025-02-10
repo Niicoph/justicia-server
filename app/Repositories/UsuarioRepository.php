@@ -21,16 +21,14 @@ class UsuarioRepository
         return Usuario::create($usuarioData);
     }
 
-    public function updateUsuario(array $usuarioData, $id)
+    public function updateUsuario(array $usuarioData, $usuario)
     {
-        $usuario = Usuario::findOrFail($id);
         $usuario->update($usuarioData);
         return $usuario;
     }
 
-    public function destroyUsuario($id)
+    public function destroyUsuario($usuario)
     {
-        $usuario = Usuario::findOrFail($id);
         $usuario->delete();
     }
 }

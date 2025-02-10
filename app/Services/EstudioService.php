@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Repositories\EstudioRepository;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Estudio;
 
 class EstudioService
@@ -40,6 +39,7 @@ class EstudioService
 
     /**
      * Crea un nuevo estudio
+     * @param array $estudioData
      * @return \App\Models\Estudio
      */
     public function storeEstudio(array $estudioData)
@@ -50,8 +50,8 @@ class EstudioService
 
     /**
      * Actualiza un estudio
-     * @param \App\Http\Requests\EstudioRequest $estudioRequest
      * @param int $id
+     * @param array $estudioData
      * @return \App\Models\Estudio
      */
     public function updateEstudio(array $estudioData, $id)

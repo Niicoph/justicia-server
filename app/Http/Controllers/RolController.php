@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RolRequest as RequestRol;
 use App\Services\RolService;
-use Exception;
-use Throwable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
+use Illuminate\Auth\Access\AuthorizationException;
 
 
 class RolController extends Controller
@@ -25,8 +23,13 @@ class RolController extends Controller
     {
         try {
             $roles = $this->rolService->getRoles();
+            if ($roles->isEmpty()) {
+                return response()->json(['message' => 'No hay roles para mostrar'], 404);
+            }
             return response()->json($roles, 200);
-        } catch (Exception $e) {
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para ver los roles'], 403);
+        } catch (\Exception $e) {
             return response()->json(['message' => 'Error al obtener los roles', 'error' => $e->getMessage()], 500);
         }
     }
@@ -42,10 +45,10 @@ class RolController extends Controller
             return response()->json($rol, 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Rol no encontrado'], 404);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Error en la consulta', 'error' => $e->getMessage()], 500);
-        } catch (Throwable $e) {
-            return response()->json(['message' => 'Error inesperado', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para ver este rol'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al obtener el rol', 'error' => $e->getMessage()], 500);
         }
     }
     /**
@@ -55,10 +58,13 @@ class RolController extends Controller
      */
     public function store(RequestRol $rolRequest)
     {
+        $validated_data = $rolRequest->validated();
         try {
-            $rol = $this->rolService->createRol($rolRequest);
+            $rol = $this->rolService->createRol($validated_data);
             return response()->json($rol, 201);
-        } catch (Exception $e) {
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para crear un rol'], 403);
+        } catch (\Exception $e) {
             return response()->json(['message' => 'Error al crear el rol', 'error' => $e->getMessage()], 500);
         }
     }
@@ -70,15 +76,16 @@ class RolController extends Controller
      */
     public function update(RequestRol $rolRequest, $id)
     {
+        $validated_data = $rolRequest->validated();
         try {
-            $rol = $this->rolService->updateRol($rolRequest, $id);
+            $rol = $this->rolService->updateRol($validated_data, $id);
             return response()->json($rol, 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Rol no encontrado'], 404);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Error en la consulta', 'error' => $e->getMessage()], 500);
-        } catch (Throwable $e) {
-            return response()->json(['message' => 'Error inesperado', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para actualizar este rol'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al actualizar el rol', 'error' => $e->getMessage()], 500);
         }
     }
     /**
@@ -93,10 +100,10 @@ class RolController extends Controller
             return response()->json(['message' => 'Rol eliminado'], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Rol no encontrado'], 404);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Error en la consulta', 'error' => $e->getMessage()], 500);
-        } catch (Throwable $e) {
-            return response()->json(['message' => 'Error inesperado', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para eliminar este rol'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al eliminar el rol', 'error' => $e->getMessage()], 500);
         }
     }
 }

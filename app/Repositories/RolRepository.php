@@ -21,16 +21,14 @@ class RolRepository
         return Rol::create($rolData);
     }
 
-    public function updateRol(array $rolData, $id)
+    public function updateRol(array $rolData, $rol)
     {
-        $rol = Rol::findOrFail($id);
         $rol->update($rolData);
         return $rol;
     }
 
-    public function destroyRol($id)
+    public function destroyRol($rol)
     {
-        $rol = Rol::findOrFail($id);
         $rol->delete();
     }
 }

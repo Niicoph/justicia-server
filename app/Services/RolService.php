@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
-use App\Http\Requests\RolRequest as RolRequest;
 use App\Repositories\RolRepository;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Models\Rol;
 
 class RolService
 {
+    use AuthorizesRequests;
     protected $rolRepository;
 
     public function __construct(RolRepository $rolRepository)
@@ -19,6 +21,7 @@ class RolService
      */
     public function getRoles()
     {
+        $this->authorize('viewAny', Rol::class);
         return $this->rolRepository->getRoles();
     }
     /**
@@ -28,34 +31,41 @@ class RolService
      */
     public function getRolById($id)
     {
-        return $this->rolRepository->getRolById($id);
+        $rol =  $this->rolRepository->getRolById($id);
+        $this->authorize('view', $rol);
+        return $rol;
     }
     /**
      * Crea un nuevo rol
-     * @param RolRequest $rolRequest
+     * @param array $rolData
      * @return \App\Models\Rol
      */
-    public function createRol(RolRequest $rolRequest)
+    public function createRol(array $rolData)
     {
-        $validated_data = $rolRequest->validated();
-        return $this->rolRepository->createRol($validated_data);
+        $this->authorize('create', Rol::class);
+        return $this->rolRepository->createRol($rolData);
     }
     /**
      * Actualiza un rol
-     * @param RolRequest $rolRequest
+     * @param array $rolData
      * @param int $id
+     * @return \App\Models\Rol
      */
-    public function updateRol(RolRequest $rolRequest, $id)
+    public function updateRol(array $rolData, $id)
     {
-        $validated_data = $rolRequest->validated();
-        return $this->rolRepository->updateRol($validated_data, $id);
+        $rol = $this->getRolById($id);
+        $this->authorize('update', $rol);
+        return $this->rolRepository->updateRol($rolData, $rol);
     }
     /**
      * Elimina un rol
      * @param int $id
+     * @return void
      */
     public function destroyRol($id)
     {
-        return $this->rolRepository->destroyRol($id);
+        $rol = $this->getRolById($id);
+        $this->authorize('delete', $rol);
+        $this->rolRepository->destroyRol($rol);
     }
 }
