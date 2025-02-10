@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EstudioRequest;
 use App\Services\EstudioService;
-use Exception;
+use Illuminate\Routing\Controller;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Throwable;
+use Illuminate\Auth\Access\AuthorizationException;
 
 
 class EstudioController extends Controller
@@ -26,9 +25,14 @@ class EstudioController extends Controller
     {
         try {
             $estudios = $this->estudioService->getEstudios();
+            if ($estudios->isEmpty()) {
+                return response()->json(['message' => 'No hay estudios para mostrar'], 404);
+            }
             return response()->json($estudios, 200);
-        } catch (Exception $e) {
-            return response()->json(['message' => 'Error al obtener los estudios', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para ver los estudios'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al mostrar los estudios', 'error' => $e->getMessage()], 500);
         }
     }
     /**
@@ -43,10 +47,10 @@ class EstudioController extends Controller
             return response()->json($estudio, 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Estudio no encontrado'], 404);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Error en la consulta', 'error' => $e->getMessage()], 500);
-        } catch (Throwable $e) {
-            return response()->json(['message' => 'Error inesperado', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para ver este estudio'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al obtener el estudio', 'error' => $e->getMessage()], 500);
         }
     }
     /**
@@ -56,11 +60,13 @@ class EstudioController extends Controller
      */
     public function store(EstudioRequest $estudioRequest)
     {
+        $validated_data = $estudioRequest->validated();
         try {
-            $validated_data = $estudioRequest->validated();
             $estudio = $this->estudioService->storeEstudio($validated_data);
             return response()->json($estudio, 201);
-        } catch (Exception $e) {
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para crear un estudio'], 403);
+        } catch (\Exception $e) {
             return response()->json(['message' => 'Error al crear el estudio', 'error' => $e->getMessage()], 500);
         }
     }
@@ -72,16 +78,16 @@ class EstudioController extends Controller
      */
     public function update(EstudioRequest $estudioRequest, $id)
     {
+        $validated_data = $estudioRequest->validated();
         try {
-            $validated_data = $estudioRequest->validated();
             $estudio = $this->estudioService->updateEstudio($validated_data, $id);
             return response()->json($estudio, 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Estudio no encontrado'], 404);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Error en la consulta', 'error' => $e->getMessage()], 500);
-        } catch (Throwable $e) {
-            return response()->json(['message' => 'Error inesperado', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para actualizar este estudio'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al actualizar el estudio', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -97,10 +103,10 @@ class EstudioController extends Controller
             return response()->json(['message' => 'Estudio eliminado correctamente'], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Estudio no encontrado'], 404);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Error en la consulta', 'error' => $e->getMessage()], 500);
-        } catch (Throwable $e) {
-            return response()->json(['message' => 'Error inesperado', 'error' => $e->getMessage()], 500);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para eliminar este estudio'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al eliminar el estudio', 'error' => $e->getMessage()], 500);
         }
     }
 }

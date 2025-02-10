@@ -3,11 +3,14 @@
 namespace App\Services;
 
 use App\Repositories\EstudioRepository;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Estudio;
 
 class EstudioService
 {
+    use AuthorizesRequests;
     protected $estudioRepository;
-
     public function __construct(EstudioRepository $estudioRepository)
     {
         $this->estudioRepository = $estudioRepository;
@@ -19,6 +22,7 @@ class EstudioService
      */
     public function getEstudios()
     {
+        $this->authorize('viewAny', Estudio::class);
         return $this->estudioRepository->getEstudios();
     }
 
@@ -29,16 +33,18 @@ class EstudioService
      */
     public function getEstudioById($id)
     {
-        return $this->estudioRepository->getEstudioById($id);
+        $estudio = $this->estudioRepository->getEstudioById($id);
+        $this->authorize('view', $estudio);
+        return $estudio;
     }
 
     /**
      * Crea un nuevo estudio
-     * @param \App\Http\Requests\EstudioRequest $estudioRequest
      * @return \App\Models\Estudio
      */
     public function storeEstudio(array $estudioData)
     {
+        $this->authorize('create', Estudio::class);
         return $this->estudioRepository->createEstudio($estudioData);
     }
 
@@ -50,7 +56,9 @@ class EstudioService
      */
     public function updateEstudio(array $estudioData, $id)
     {
-        return $this->estudioRepository->updateEstudio($estudioData, $id);
+        $estudio = $this->getEstudioById($id);
+        $this->authorize('update', $estudio);
+        return $this->estudioRepository->updateEstudio($estudioData, $estudio);
     }
 
     /**
@@ -60,6 +68,8 @@ class EstudioService
      */
     public function deleteEstudio($id)
     {
-        return $this->estudioRepository->deleteEstudio($id);
+        $estudio = $this->getEstudioById($id);
+        $this->authorize('delete', $estudio);
+        return $this->estudioRepository->deleteEstudio($estudio);
     }
 }

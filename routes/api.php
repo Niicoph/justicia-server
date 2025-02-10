@@ -20,13 +20,10 @@ Route::prefix('v1')->group(function () {
         Route::get('me', 'loggedUser')->name('auth.me');
     });
 
-    Route::apiResources([
-        'estudios' => EstudioController::class,
-        'roles' => RolController::class,
-    ]);
-
     Route::middleware('auth.jwt')->group(function () {
         Route::apiResource('eventos', EventoController::class);
         Route::apiResource('usuarios', UsuarioController::class);
+        Route::apiResource('estudios', EstudioController::class);
+        Route::apiResource('roles', RolController::class);
     });
 });

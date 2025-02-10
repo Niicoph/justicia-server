@@ -21,16 +21,14 @@ class EstudioRepository
         return Estudio::create($estudioData);
     }
 
-    public function updateEstudio(array $estudioData, $id)
+    public function updateEstudio(array $estudioData, $estudio)
     {
-        $estudio = Estudio::findOrFail($id);
         $estudio->update($estudioData);
         return $estudio;
     }
 
-    public function deleteEstudio($id)
+    public function deleteEstudio($estudio)
     {
-        $estudio = Estudio::findOrFail($id);
         $estudio->delete();
     }
 }
