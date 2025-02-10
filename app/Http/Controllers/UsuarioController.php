@@ -16,6 +16,24 @@ class UsuarioController extends Controller
         $this->usuarioService = $usuarioService;
     }
     /**
+     * Muestra una lista de Usuarios de un estudio
+     * @return \Illuminate\Http\Response
+     */
+    public function indexByEstudio()
+    {
+        try {
+            $usuarios = $this->usuarioService->getUsuariosByEstudio();
+            if ($usuarios->isEmpty()) {
+                return response()->json(['message' => 'No hay usuarios para mostrar'], 404);
+            }
+            return response()->json($usuarios, 200);
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => 'No tienes permiso para ver los usuarios de este estudio'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al mostrar los usuarios', 'error' => $e->getMessage()], 500);
+        }
+    }
+    /**
      * Muestra una lista de Usuarios
      * @return \Illuminate\Http\Response
      */

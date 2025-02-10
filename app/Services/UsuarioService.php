@@ -18,7 +18,16 @@ class UsuarioService
     {
         $this->usuarioRepository = $usuarioRepository;
     }
-
+    /**
+     * Muestra una lista de usuarios de un estudio
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getUsuariosByEstudio()
+    {
+        $user = Auth::user();
+        $this->authorize('viewUsuarios', $user);
+        return $this->usuarioRepository->getUsuariosByEstudio($user->estudio_id);
+    }
     /**
      * Muestra una lista de usuarios
      * @return \Illuminate\Database\Eloquent\Collection

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('notas', function (Blueprint $table) {
             $table->id();
-            $table->string('estado');
+            $table->string('estado')->default('pendiente');
             $table->string('titulo');
             $table->text('descripcion');
             $table->foreignId('usuario_id')->constrained('usuarios')->onDelete('cascade');

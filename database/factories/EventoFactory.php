@@ -24,7 +24,7 @@ class EventoFactory extends Factory
             'hora_fin' => $this->faker->time(),
             'notificar' => $this->faker->boolean,
             'minutos_previos_notificacion' => $this->faker->randomElement([5, 10, 15, 30, 60]),
-            'usuario_id' => $this->faker->numberBetween(2, 11),
+            'usuario_id' => $this->faker->numberBetween(1, 10),
         ];
     }
 }

@@ -11,7 +11,17 @@ class UsuarioPolicy
      */
     public function viewAny(Usuario $usuario): bool
     {
+        // si soy superadmin puedo ver todos los usuarios
         return $usuario->rol->nombre === 'superadmin';
+    }
+
+    /**
+     * Determine whether the user can view a list of models.
+     */
+    public function viewUsuarios(Usuario $usuario): bool
+    {
+        // si soy admin puedo ver todos los usuarios de mi estudio
+        return $usuario->rol->nombre === 'admin';
     }
 
     /**

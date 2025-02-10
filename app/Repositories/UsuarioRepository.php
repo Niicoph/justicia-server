@@ -10,6 +10,10 @@ class UsuarioRepository
     {
         return Usuario::all();
     }
+    public function getUsuariosByEstudio($estudio_id)
+    {
+        return Usuario::where('estudio_id', $estudio_id)->get();
+    }
 
     public function getUsuarioById($id)
     {
