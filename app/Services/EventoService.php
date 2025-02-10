@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Evento;
+use Illuminate\Support\Facades\Auth;
 use App\Repositories\EventoRepository;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class EventoService
 {
+    use AuthorizesRequests;
     protected $eventoRepository;
     public function __construct(EventoRepository $eventoRepository)
     {
@@ -15,29 +17,33 @@ class EventoService
 
     /**
      * Muestra una lista de eventos personales (auth user)
-     * @param int $userId
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getEventos($userId)
+    public function getEventos()
     {
+        $userId = Auth::id();
         return $this->eventoRepository->getEventos($userId);
     }
     /**
      * Muestra un evento específico
      * @param int $id
-     * @return \App\Models\Evento
+     * @param int $userId
+     * @return \App\Models\Evento || exception
      */
     public function getEventoById($id)
     {
-        return $this->eventoRepository->getEventoById($id);
+        $evento = $this->eventoRepository->getEventoById($id);
+        $this->authorize('view', $evento);
+        return $evento;
     }
     /**
-     * Crea un nuevo evento
+     * Crea un nuevo evento. Asigna el usuario autenticado como creador
      * @param array $eventoData
      * @return \App\Models\Evento
      */
     public function storeEvento(array $eventoData)
     {
+        $eventoData['usuario_id'] = Auth::id();
         return $this->eventoRepository->createEvento($eventoData);
     }
     /**
@@ -48,7 +54,10 @@ class EventoService
      */
     public function updateEvento(array $eventoData, $id)
     {
-        return $this->eventoRepository->updateEvento($eventoData, $id);
+        $evento = $this->getEventoById($id);
+        $this->authorize('update', $evento);
+        $eventoData['usuario_id'] = Auth::id();
+        return $this->eventoRepository->updateEvento($eventoData, $evento);
     }
     /**
      * Elimina un evento
@@ -57,6 +66,8 @@ class EventoService
      */
     public function deleteEvento($id)
     {
-        return $this->eventoRepository->deleteEvento($id);
+        $evento = $this->getEventoById($id);
+        $this->authorize('delete', $evento);
+        $this->eventoRepository->deleteEvento($evento);
     }
 }

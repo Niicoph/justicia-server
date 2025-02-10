@@ -14,10 +14,10 @@ Route::prefix('v1')->group(function () {
         Route::post('register', 'register')->name('auth.register');
     });
 
-    Route::prefix('auth')->middleware('auth:api')->controller(AuthController::class)->group(function () {
+    Route::prefix('auth')->controller(AuthController::class)->group(function () {
         Route::post('logout', 'logout')->name('auth.logout');
         Route::post('refresh', 'refresh')->name('auth.refresh');
-        Route::post('me', 'loggedUser')->name('auth.me');
+        Route::get('me', 'loggedUser')->name('auth.me');
     });
 
     Route::apiResources([

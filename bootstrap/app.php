@@ -13,12 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Registra el middleware aquí
         $middleware->alias([
             'auth.jwt' => JwtFromCookie::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })
+    ->withExceptions(function (Exceptions $exceptions) {})
     ->create();

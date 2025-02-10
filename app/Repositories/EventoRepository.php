@@ -16,22 +16,19 @@ class EventoRepository
     {
         return Evento::findOrFail($id);
     }
-
     public function createEvento(array $eventoData)
     {
         return Evento::create($eventoData);
     }
 
-    public function updateEvento(array $eventoData, $id)
+    public function updateEvento(array $eventoData, $evento)
     {
-        $evento = Evento::findOrFail($id);
         $evento->update($eventoData);
         return $evento;
     }
 
-    public function deleteEvento($id)
+    public function deleteEvento($evento)
     {
-        $evento = Evento::findOrFail($id);
         $evento->delete();
     }
 }
