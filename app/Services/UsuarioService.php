@@ -71,6 +71,9 @@ class UsuarioService
     {
         $usuario = $this->getUsuarioById($id);
         $this->authorize('update', $usuario);
+        if (isset($usuarioData['password'])) {
+            $usuarioData['password'] = Hash::make($usuarioData['password']);
+        }
         return $this->usuarioRepository->updateUsuario($usuarioData, $usuario);
     }
     /**
