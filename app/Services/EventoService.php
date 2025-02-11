@@ -16,6 +16,26 @@ class EventoService
     }
 
     /**
+     * Muestra una lista de eventos totales
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getTodayEventos()
+    {
+        $eventos = $this->eventoRepository->getEventosTotal();
+        $filteredEvents = [];
+        $horaActual = date('H:i:s');
+        foreach ($eventos as $evento) {
+            $horaInicio = $evento->hora_inicio;
+            if ($horaInicio > $horaActual) {
+                $filteredEvents[] = $evento;
+            }
+        }
+        return $filteredEvents;
+    }
+
+
+
+    /**
      * Muestra una lista de eventos personales (auth user)
      * @return \Illuminate\Database\Eloquent\Collection
      */

@@ -7,6 +7,11 @@ use App\Models\Evento;
 class EventoRepository
 {
 
+    public function getEventosTotal()
+    {
+        return Evento::where('fecha', now()->toDateString())->get();
+    }
+
     public function getEventos($userId)
     {
         return Evento::where('usuario_id', $userId)->get();
