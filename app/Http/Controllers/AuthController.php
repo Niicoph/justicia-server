@@ -113,6 +113,8 @@ class AuthController extends Controller
         try {
             $user = $this->authService->loggedUser();
             return response()->json($user, 200);
+        } catch (AuthenticationException $e) {
+            return response()->json(['message' => 'No autenticado'], 401);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error en el servidor'], 500);
         }
