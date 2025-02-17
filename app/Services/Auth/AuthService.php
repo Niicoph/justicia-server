@@ -42,7 +42,7 @@ class AuthService
 
         return [
             'token' => base64_encode($token),
-            'user' => Auth::user()->nombre
+            'user' => Auth::user()
         ];
     }
 

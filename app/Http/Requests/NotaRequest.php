@@ -23,7 +23,7 @@ class NotaRequest extends FormRequest
     {
         $rules =  [
             // el estado tendra como default un valor de 'pendiente'
-            'estado' => 'required|string',
+            'estado' => 'sometimes|string',
             'titulo' => 'required|string',
             'descripcion' => 'sometimes|string',
         ];

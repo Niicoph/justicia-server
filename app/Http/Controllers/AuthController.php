@@ -51,10 +51,7 @@ class AuthController extends Controller
             $credentials = $request->only(['email', 'password']);
             $response = $this->authService->login($credentials);
             return response()->json(
-                [
-                    'Message' => "Usuario logueado exitosamente",
-                    'User' => $response['user']
-                ],
+                $response['user'],
                 200
             )->cookie('sessionId', $response['token'], 0, '/', null, true, true);
         } catch (AuthenticationException $e) {
