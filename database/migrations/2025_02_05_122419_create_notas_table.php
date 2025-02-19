@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('notas', function (Blueprint $table) {
             $table->id();
             $table->string('estado')->default('pendiente');
-            $table->string('titulo');
-            $table->text('descripcion');
+            $table->string('titulo')->default('Nota');
+            $table->text('descripcion')->nullable();
             $table->foreignId('usuario_id')->constrained('usuarios')->onDelete('cascade');
             $table->timestamps();
         });

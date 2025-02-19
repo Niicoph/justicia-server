@@ -24,7 +24,7 @@ class NotaRequest extends FormRequest
         $rules =  [
             // el estado tendra como default un valor de 'pendiente'
             'estado' => 'sometimes|string',
-            'titulo' => 'required|string',
+            'titulo' => 'sometimes|string',
             'descripcion' => 'sometimes|string',
         ];
         if ($this->isMethod('put')) {
@@ -41,11 +41,10 @@ class NotaRequest extends FormRequest
     public function messages()
     {
         return [
-            'estado.required' => 'El estado es obligatorio',
-            'estado.string' => 'El estado debe ser una cadena de texto',
-            'titulo.required' => 'El título es obligatorio',
-            'titulo.string' => 'El título debe ser una cadena de texto',
-            'descripcion.string' => 'La descripción debe ser una cadena de texto',
+            // 'estado.string' => 'El estado debe ser una cadena de texto',
+            // 'titulo.required' => 'El título es obligatorio',
+            // 'titulo.string' => 'El título debe ser una cadena de texto',
+            // 'descripcion.string' => 'La descripción debe ser una cadena de texto',
         ];
     }
 }

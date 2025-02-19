@@ -19,8 +19,8 @@ class Usuario extends Authenticatable implements JWTSubject
     use Notifiable;
 
     protected $table = 'usuarios';
-    protected $fillable = ['nombre', 'email', 'password', 'avatar', 'estudio_id', 'rol_id'];
-    protected $hidden = ['password'];
+    protected $fillable = ['nombre', 'email', 'password', 'avatar'];
+    protected $hidden = ['password', 'estudio_id', 'rol_id', 'id'];
 
     // un usuario pertenece a un unico estudio
     public function estudios()
